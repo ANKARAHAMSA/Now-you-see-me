@@ -157,12 +157,7 @@ def _get_face_crop_for_person(
     if best_crop is not None and best_crop.size > 0:
         return cv2.resize(best_crop, (size, size))
 
-    # ── Fallback: top 45% of person crop (where face typically is) ──────────
-    h_person = py2 - py1
-    face_region = frame[max(0, py1): py1 + int(h_person * 0.45), max(0, px1):px2]
-    if face_region.size > 0 and face_region.shape[0] > 20 and face_region.shape[1] > 20:
-        return cv2.resize(face_region, (size, size))
-
+    # NO FALLBACK to non-face crops — if no face detected in person box, return None
     return None
 
 
@@ -282,8 +277,8 @@ def run_detection(config: dict, args: argparse.Namespace):
             ]
             loiterers = loitering.update(person_track_ids)
 
-            # ── Face Detection (every 2nd frame for smooth speed) ──────────
-            face_boxes = _detect_faces_in_frame(frame) if (frame_index % 2 == 0) else []
+            # ── Face Detection ──────────────────────────────────────────────
+            face_boxes = _detect_faces_in_frame(frame) if any(d.category == "person" for d in detections) else []
 
             # ── Process each detection ─────────────────────────────────────
             for det in detections:
