@@ -37,51 +37,104 @@ st.set_page_config(
 # ─── Custom CSS ───────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
-    /* Dark theme overrides */
-    .main { background-color: #0d1117; }
-    .stApp { background-color: #0d1117; }
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
-    /* Metric cards */
-    .metric-card {
-        background: linear-gradient(135deg, #1a1f2e, #252d3d);
-        border: 1px solid #30363d;
-        border-radius: 12px;
-        padding: 16px 20px;
-        margin: 6px 0;
+    html, body, [class*="css"], .stApp {
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
+        background-color: #0A0E17 !important;
+        color: #E2E8F0 !important;
     }
 
-    /* Alert badges */
-    .badge-high   { background:#ff4444; color:#fff; padding:3px 10px; border-radius:20px; font-size:0.78em; }
-    .badge-medium { background:#ff8800; color:#fff; padding:3px 10px; border-radius:20px; font-size:0.78em; }
-    .badge-low    { background:#2ea043; color:#fff; padding:3px 10px; border-radius:20px; font-size:0.78em; }
+    /* Minimalist sleek sidebar */
+    [data-testid="stSidebar"] {
+        background-color: #0F172A !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
+    }
+
+    /* Glassmorphism Metric Cards */
+    .metric-card {
+        background: rgba(15, 23, 42, 0.7);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        padding: 18px 22px;
+        margin-bottom: 12px;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .metric-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(56, 189, 248, 0.4);
+    }
+    .metric-value {
+        font-size: 2.2em;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        color: #F8FAFC;
+    }
+    .metric-label {
+        font-size: 0.85em;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #94A3B8;
+        margin-bottom: 4px;
+    }
 
     /* Section headers */
     .section-header {
-        font-size: 1.1em;
+        font-size: 1.25em;
         font-weight: 700;
-        color: #58a6ff;
-        border-bottom: 1px solid #30363d;
-        padding-bottom: 6px;
-        margin: 16px 0 10px 0;
+        letter-spacing: -0.01em;
+        color: #38BDF8;
+        padding-bottom: 8px;
+        margin: 20px 0 14px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    /* Live indicator */
+    /* Modern Tabs */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+        background-color: rgba(15, 23, 42, 0.5);
+        padding: 6px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .stTabs [data-baseweb="tab"] {
+        height: 42px;
+        border-radius: 8px;
+        color: #94A3B8;
+        font-weight: 600;
+        font-size: 0.9em;
+        border: none !important;
+        padding: 0 18px;
+    }
+    .stTabs [aria-selected="true"] {
+        background-color: #0284C7 !important;
+        color: #FFFFFF !important;
+        box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+    }
+
+    /* Alert badges */
+    .badge-high   { background: rgba(239, 68, 68, 0.2); color: #FCA5A5; border: 1px solid rgba(239, 68, 68, 0.4); padding: 4px 12px; border-radius: 20px; font-weight: 600; font-size: 0.78em; }
+    .badge-medium { background: rgba(245, 158, 11, 0.2); color: #FDE047; border: 1px solid rgba(245, 158, 11, 0.4); padding: 4px 12px; border-radius: 20px; font-weight: 600; font-size: 0.78em; }
+    .badge-low    { background: rgba(16, 185, 129, 0.2); color: #6EE7B7; border: 1px solid rgba(16, 185, 129, 0.4); padding: 4px 12px; border-radius: 20px; font-weight: 600; font-size: 0.78em; }
+
+    /* Live pulse indicator */
     .live-dot {
         display: inline-block;
         width: 10px; height: 10px;
-        background: #2ea043;
+        background: #10B981;
         border-radius: 50%;
         animation: pulse 1.5s infinite;
         margin-right: 8px;
     }
     @keyframes pulse {
-        0%  { box-shadow: 0 0 0 0 rgba(46,160,67,0.6); }
-        70% { box-shadow: 0 0 0 8px rgba(46,160,67,0); }
-        100%{ box-shadow: 0 0 0 0 rgba(46,160,67,0); }
+        0%  { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+        70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+        100%{ box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
     }
-
-    /* Snapshot grid */
-    .snapshot-img { border-radius: 8px; border: 1px solid #30363d; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -388,37 +441,39 @@ def render_analytics(db):
             title="Events by Type",
             hole=0.4,
             color_discrete_map={
-                "intruder": "#ff4444",
-                "animal": "#ff8800",
-                "loitering": "#aa44ff",
-                "vehicle": "#ffcc00",
+                "intruder": "#EF4444",
+                "animal": "#F59E0B",
+                "loitering": "#A855F7",
+                "vehicle": "#3B82F6",
+                "spoof_attack": "#EC4899",
             },
         )
         fig.update_layout(
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
-            font_color="#c9d1d9",
+            font_color="#94A3B8",
         )
         st.plotly_chart(fig, use_container_width=True)
 
     with col2:
         # Events over time (line chart)
-        df["hour"] = df["timestamp"].dt.floor("H")
+        df["hour"] = df["timestamp"].dt.floor("h")
         hourly = df.groupby(["hour", "event_type"]).size().reset_index(name="count")
         fig2 = px.line(
             hourly, x="hour", y="count", color="event_type",
             title="Events Over Time",
             color_discrete_map={
-                "intruder": "#ff4444",
-                "animal": "#ff8800",
-                "loitering": "#aa44ff",
-                "vehicle": "#ffcc00",
+                "intruder": "#EF4444",
+                "animal": "#F59E0B",
+                "loitering": "#A855F7",
+                "vehicle": "#3B82F6",
+                "spoof_attack": "#EC4899",
             },
         )
         fig2.update_layout(
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
-            font_color="#c9d1d9",
+            font_color="#94A3B8",
         )
         st.plotly_chart(fig2, use_container_width=True)
 
