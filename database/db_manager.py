@@ -43,13 +43,15 @@ CREATE INDEX IF NOT EXISTS idx_event_type ON events(event_type);
 class DatabaseManager:
     """Thread-safe SQLite event log manager."""
 
-    def __init__(self):
+    def __init__(self, db_path: Path | str = DB_PATH):
+        self.db_path = Path(db_path)
+        self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self._lock = threading.Lock()
         self._init_db()
-        logger.info(f"Database ready: {DB_PATH.resolve()}")
+        logger.info(f"Database ready: {self.db_path.resolve()}")
 
     def _get_conn(self) -> sqlite3.Connection:
-        conn = sqlite3.connect(str(DB_PATH), check_same_thread=False)
+        conn = sqlite3.connect(str(self.db_path), check_same_thread=False)
         conn.row_factory = sqlite3.Row
         return conn
 
