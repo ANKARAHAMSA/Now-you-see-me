@@ -225,18 +225,16 @@ def render_live_feed():
         st.checkbox("🌙 Night Vision", value=True)
         st.checkbox("📍 Zone Monitoring", value=True)
 
-    # Single frame capture for display
-    try:
-        cap = cv2.VideoCapture(0)
-        ret, frame = cap.read()
-        cap.release()
-        if ret:
-            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            feed_placeholder.image(frame_rgb, channels="RGB", use_column_width=True, caption="Live Feed")
-        else:
-            feed_placeholder.warning("⚠️ Camera not available. Run `python main.py` in a terminal.")
-    except Exception:
-        feed_placeholder.info("💡 Camera preview not available in dashboard mode.\nRun `python main.py` for full live detection.")
+    # Show latest snapshot from database/snapshots/ or camera capture
+    snapshots_dir = Path("database/snapshots")
+    recent_snapshots = sorted(list(snapshots_dir.glob("*.jpg")), key=lambda p: p.stat().st_mtime, reverse=True) if snapshots_dir.exists() else []
+
+    if recent_snapshots:
+        latest_img = recent_snapshots[0]
+        mtime = datetime.fromtimestamp(latest_img.stat().st_mtime).strftime("%H:%M:%S")
+        feed_placeholder.image(str(latest_img), caption=f"📸 Latest Detection Snapshot ({latest_img.name} at {mtime})", use_column_width=True)
+    else:
+        feed_placeholder.info("💡 Camera is running under `main.py`. Start `python3 main.py` to generate live events & snapshots!")
 
 
 def render_event_log(db):
