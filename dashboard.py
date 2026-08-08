@@ -41,90 +41,136 @@ st.markdown("""
 
     html, body, [class*="css"], .stApp {
         font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
-        background-color: #0A0E17 !important;
-        color: #E2E8F0 !important;
+        background-color: #030712 !important;
+        color: #F3F4F6 !important;
     }
 
-    /* Minimalist sleek sidebar */
+    header[data-testid="stHeader"] {
+        background: transparent !important;
+    }
+
+    /* Minimalist Dark Sidebar */
     [data-testid="stSidebar"] {
-        background-color: #0F172A !important;
-        border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
+        background-color: #0B0F17 !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
     }
 
-    /* Glassmorphism Metric Cards */
-    .metric-card {
-        background: rgba(15, 23, 42, 0.7);
+    /* Modern Glassmorphic Buttons */
+    .stButton > button, button[kind="secondary"], button[kind="primary"] {
+        background: rgba(255, 255, 255, 0.03) !important;
+        color: #F3F4F6 !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 10px !important;
+        padding: 8px 18px !important;
+        font-weight: 600 !important;
+        font-size: 0.88em !important;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+        backdrop-filter: blur(10px) !important;
+    }
+    .stButton > button:hover {
+        background: rgba(56, 189, 248, 0.12) !important;
+        border-color: rgba(56, 189, 248, 0.4) !important;
+        color: #38BDF8 !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 0 20px rgba(56, 189, 248, 0.25) !important;
+    }
+
+    /* Glassmorphic Metric Stat Cards */
+    .glass-card {
+        background: rgba(17, 24, 39, 0.55);
         backdrop-filter: blur(16px);
         -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.07);
         border-radius: 14px;
-        padding: 18px 22px;
-        margin-bottom: 12px;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        transition: transform 0.2s ease, border-color 0.2s ease;
+        padding: 16px 20px;
+        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+        transition: all 0.25s ease;
     }
-    .metric-card:hover {
+    .glass-card:hover {
+        border-color: rgba(56, 189, 248, 0.3);
         transform: translateY(-2px);
-        border-color: rgba(56, 189, 248, 0.4);
     }
-    .metric-value {
-        font-size: 2.2em;
+    .glass-metric-title {
+        font-size: 0.75em;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #9CA3AF;
+        margin-bottom: 6px;
+    }
+    .glass-metric-val {
+        font-size: 2.0em;
         font-weight: 800;
         letter-spacing: -0.02em;
-        color: #F8FAFC;
+        color: #FFFFFF;
+        line-height: 1.1;
     }
-    .metric-label {
-        font-size: 0.85em;
+    .glass-metric-sub {
+        font-size: 0.75em;
+        color: #6B7280;
+        margin-top: 4px;
+    }
+
+    /* Glassmorphic Expanders */
+    .stExpander {
+        background: rgba(17, 24, 39, 0.4) !important;
+        border: 1px solid rgba(255, 255, 255, 0.06) !important;
+        border-radius: 12px !important;
+        backdrop-filter: blur(12px) !important;
+    }
+    [data-testid="stExpanderDetails"] {
+        background: transparent !important;
+    }
+
+    /* Glassmorphic Form Inputs & Selectboxes */
+    div[data-baseweb="select"] > div, .stTextInput > div > div > input {
+        background-color: rgba(17, 24, 39, 0.6) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 10px !important;
+        color: #F3F4F6 !important;
+        backdrop-filter: blur(10px) !important;
+    }
+
+    /* Glassmorphic Tabs */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 6px;
+        background-color: rgba(17, 24, 39, 0.4);
+        padding: 5px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .stTabs [data-baseweb="tab"] {
+        height: 40px;
+        border-radius: 9px;
+        color: #9CA3AF;
         font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: #94A3B8;
-        margin-bottom: 4px;
+        font-size: 0.88em;
+        border: none !important;
+        padding: 0 16px;
+    }
+    .stTabs [aria-selected="true"] {
+        background: rgba(56, 189, 248, 0.15) !important;
+        color: #38BDF8 !important;
+        border: 1px solid rgba(56, 189, 248, 0.3) !important;
+        box-shadow: 0 4px 16px rgba(56, 189, 248, 0.2);
     }
 
     /* Section headers */
     .section-header {
-        font-size: 1.25em;
+        font-size: 1.2em;
         font-weight: 700;
         letter-spacing: -0.01em;
         color: #38BDF8;
         padding-bottom: 8px;
-        margin: 20px 0 14px 0;
+        margin: 18px 0 14px 0;
         border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
-
-    /* Modern Tabs */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 8px;
-        background-color: rgba(15, 23, 42, 0.5);
-        padding: 6px;
-        border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.06);
-    }
-    .stTabs [data-baseweb="tab"] {
-        height: 42px;
-        border-radius: 8px;
-        color: #94A3B8;
-        font-weight: 600;
-        font-size: 0.9em;
-        border: none !important;
-        padding: 0 18px;
-    }
-    .stTabs [aria-selected="true"] {
-        background-color: #0284C7 !important;
-        color: #FFFFFF !important;
-        box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
-    }
-
-    /* Alert badges */
-    .badge-high   { background: rgba(239, 68, 68, 0.2); color: #FCA5A5; border: 1px solid rgba(239, 68, 68, 0.4); padding: 4px 12px; border-radius: 20px; font-weight: 600; font-size: 0.78em; }
-    .badge-medium { background: rgba(245, 158, 11, 0.2); color: #FDE047; border: 1px solid rgba(245, 158, 11, 0.4); padding: 4px 12px; border-radius: 20px; font-weight: 600; font-size: 0.78em; }
-    .badge-low    { background: rgba(16, 185, 129, 0.2); color: #6EE7B7; border: 1px solid rgba(16, 185, 129, 0.4); padding: 4px 12px; border-radius: 20px; font-weight: 600; font-size: 0.78em; }
 
     /* Live pulse indicator */
     .live-dot {
         display: inline-block;
-        width: 10px; height: 10px;
+        width: 9px; height: 9px;
         background: #10B981;
         border-radius: 50%;
         animation: pulse 1.5s infinite;
@@ -233,28 +279,30 @@ def render_header():
     col1, col2 = st.columns([3, 1])
     with col1:
         st.markdown(
-            '<div style="font-size:2.2em;font-weight:800;color:#58a6ff;">'
-            '🛡 Intruder Detection System'
+            '<div style="font-size:2.2em;font-weight:800;letter-spacing:-0.03em;color:#FFFFFF;display:flex;align-items:center;gap:12px;">'
+            '🛡️ <span style="background:linear-gradient(135deg, #38BDF8, #818CF8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Intruder Detection System</span>'
             '</div>',
             unsafe_allow_html=True,
         )
         st.markdown(
+            '<div style="display:flex;align-items:center;margin-top:4px;">'
             '<span class="live-dot"></span>'
-            '<span style="color:#8b949e;font-size:0.9em;">Real-time AI Security Monitoring</span>',
+            '<span style="color:#94A3B8;font-size:0.88em;font-weight:500;">Real-time Edge AI Security Sentinel</span>'
+            '</div>',
             unsafe_allow_html=True,
         )
     with col2:
         st.markdown(
-            f'<div style="text-align:right;color:#8b949e;font-size:0.85em;margin-top:12px;">'
-            f'{datetime.now().strftime("%A, %B %d, %Y")}<br>'
-            f'<strong style="color:#c9d1d9">{datetime.now().strftime("%H:%M:%S")}</strong>'
+            f'<div style="text-align:right;color:#64748B;font-size:0.85em;padding-top:6px;">'
+            f'{datetime.now().strftime("%A, %b %d, %Y")}<br>'
+            f'<strong style="color:#F1F5F9;font-size:1.15em;letter-spacing:0.02em;">{datetime.now().strftime("%H:%M:%S")}</strong>'
             f'</div>',
             unsafe_allow_html=True,
         )
 
 
 def render_metrics(db):
-    """Top row metric cards."""
+    """Top row glassmorphic metric cards."""
     events = db.get_recent_events(1000)
     df = pd.DataFrame(events) if events else pd.DataFrame()
 
@@ -266,18 +314,60 @@ def render_metrics(db):
     total_loitering = counts.get("loitering", 0)
     today_count = len(today_df)
 
+    last_time_str = "—"
+    if events and not df.empty:
+        raw_t = str(df["timestamp"].iloc[0])
+        try:
+            last_time_str = datetime.fromisoformat(raw_t).strftime("%H:%M:%S")
+        except Exception:
+            last_time_str = raw_t[11:19] if len(raw_t) >= 19 else raw_t
+
     col1, col2, col3, col4, col5 = st.columns(5)
     with col1:
-        st.metric("🚨 Total Intruder Events", total_intruders)
+        st.markdown(
+            f'<div class="glass-card" style="border-top:3px solid #EF4444;">'
+            f'<div class="glass-metric-title">🚨 Intruders</div>'
+            f'<div class="glass-metric-val" style="color:#FCA5A5;">{total_intruders}</div>'
+            f'<div class="glass-metric-sub">Total Intruder Alerts</div>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
     with col2:
-        st.metric("🐾 Animal Events", total_animals)
+        st.markdown(
+            f'<div class="glass-card" style="border-top:3px solid #F59E0B;">'
+            f'<div class="glass-metric-title">🐾 Animals</div>'
+            f'<div class="glass-metric-val" style="color:#FDE047;">{total_animals}</div>'
+            f'<div class="glass-metric-sub">Wildlife Detections</div>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
     with col3:
-        st.metric("⏱ Loitering Events", total_loitering)
+        st.markdown(
+            f'<div class="glass-card" style="border-top:3px solid #A855F7;">'
+            f'<div class="glass-metric-title">⏱️ Loitering</div>'
+            f'<div class="glass-metric-val" style="color:#E9D5FF;">{total_loitering}</div>'
+            f'<div class="glass-metric-sub">Dwell Time Triggers</div>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
     with col4:
-        st.metric("📅 Events Today", today_count)
+        st.markdown(
+            f'<div class="glass-card" style="border-top:3px solid #38BDF8;">'
+            f'<div class="glass-metric-title">📅 Events Today</div>'
+            f'<div class="glass-metric-val" style="color:#BAE6FD;">{today_count}</div>'
+            f'<div class="glass-metric-sub">Logged Past 24h</div>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
     with col5:
-        last_event_time = df["timestamp"].iloc[0] if not df.empty else "No events yet"
-        st.metric("⏰ Last Event", str(last_event_time)[:19] if events else "—")
+        st.markdown(
+            f'<div class="glass-card" style="border-top:3px solid #10B981;">'
+            f'<div class="glass-metric-title">⏰ Last Event</div>'
+            f'<div class="glass-metric-val" style="font-size:1.6em;color:#6EE7B7;padding-top:4px;">{last_time_str}</div>'
+            f'<div class="glass-metric-sub">Most Recent Activity</div>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
 
 
 def render_live_feed():
