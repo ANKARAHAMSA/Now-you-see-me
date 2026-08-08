@@ -1,26 +1,13 @@
-# ─── Core AI / Computer Vision ───────────────────────────────────────────────
-ultralytics>=8.0.0          # YOLOv8 object detection
-opencv-python>=4.8.0        # Video capture, image processing
-deepface>=0.0.93            # Face recognition (ArcFace backend)
-tf-keras>=2.16.0            # Required by DeepFace
-numpy>=1.24.0               # Numerical computing (Grassmann SVD)
-scipy>=1.11.0               # Scientific computing utilities
+# Now You See Me — Intruder Detection System Dependencies
 
-# ─── Object Tracking ─────────────────────────────────────────────────────────
-supervision>=0.18.0         # ByteTrack wrapper + annotation tools
-
-# ─── Alerts & Messaging ──────────────────────────────────────────────────────
-python-telegram-bot>=20.0   # Async Telegram bot API
-
-# ─── Dashboard ───────────────────────────────────────────────────────────────
-streamlit>=1.30.0           # Real-time monitoring dashboard
-plotly>=5.18.0              # Charts for dashboard
-pandas>=2.0.0               # Data handling for event log display
-
-# ─── Configuration & Utilities ───────────────────────────────────────────────
-python-dotenv>=1.0.0        # .env file loading
-Pillow>=10.0.0              # Image saving/loading
-tqdm>=4.66.0                # Progress bars for enrollment
-
-# ─── Audio Alarm ─────────────────────────────────────────────────────────────
-playsound==1.2.2            # Play alarm sound (use 1.2.2 for mac compatibility)
+ultralytics>=8.0.0
+opencv-python>=4.8.0
+deepface>=0.0.79
+tf-keras>=2.15.0
+streamlit>=1.30.0
+plotly>=5.18.0
+pandas>=2.0.0
+python-dotenv>=1.0.0
+requests>=2.31.0
+tqdm>=4.66.0
+python-telegram-bot>=20.0
