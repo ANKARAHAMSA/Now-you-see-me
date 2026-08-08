@@ -47,7 +47,7 @@
   },
   "display": {
     "show_fps": true,
-    "show_zones": true,
+    "show_zones": false,
     "show_tracking_ids": true,
     "window_name": "Intruder Detection System"
   }
