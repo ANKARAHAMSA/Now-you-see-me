@@ -10,7 +10,7 @@
     "model": "ArcFace",
     "detector_backend": "opencv",
     "distance_metric": "cosine",
-    "match_threshold": 0.42,
+    "match_threshold": 0.38,
     "grassmann_frames": 10,
     "min_face_size": 40
   },
