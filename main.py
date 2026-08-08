@@ -344,7 +344,7 @@ def run_detection(config: dict, args: argparse.Namespace):
                             banner_until = time.time() + 5.0
                     else:
                         color_key = "known"
-                        label = f"✓ {name}"
+                        label = f"OK {name}"
 
                     # Loitering alert (only for UNKNOWN intruders, not registered members)
                     if name == "UNKNOWN" and det.track_id in loiterers:

@@ -45,14 +45,20 @@ def draw_detection(
     if confidence is not None:
         text = f"{text} {confidence:.0%}"
 
+    # Clean any unprintable unicode characters for OpenCV font
+    text = text.replace("✓", "OK")
+
+    font_scale = 0.85
+    font_thickness = 2
+
     # Draw text background
-    (tw, th), _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 0.55, 1)
-    cv2.rectangle(frame, (x1, y1 - th - 8), (x1 + tw + 6, y1), color, -1)
+    (tw, th), baseline = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, font_scale, font_thickness)
+    cv2.rectangle(frame, (x1, max(0, y1 - th - 12)), (x1 + tw + 10, y1), color, -1)
 
     # Draw text
     cv2.putText(
-        frame, text, (x1 + 3, y1 - 4),
-        cv2.FONT_HERSHEY_SIMPLEX, 0.55, (255, 255, 255), 1, cv2.LINE_AA
+        frame, text, (x1 + 5, y1 - 6),
+        cv2.FONT_HERSHEY_SIMPLEX, font_scale, (255, 255, 255), font_thickness, cv2.LINE_AA
     )
     return frame
 
