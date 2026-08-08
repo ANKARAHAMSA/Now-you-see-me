@@ -394,32 +394,63 @@ def render_analytics(db):
 
 
 def render_enrolled_persons():
-    """Show enrolled persons."""
-    st.markdown('<div class="section-header">👤 Enrolled Persons</div>', unsafe_allow_html=True)
+    """Show enrolled persons list with primary thumbnail & expandable full photo gallery."""
+    st.markdown('<div class="section-header">👥 Enrolled Persons Directory</div>', unsafe_allow_html=True)
 
-    from core.face_recognizer import FaceRecognizer, EMBEDDINGS_DB
-    import pickle
+    known_dir = Path("database/known_faces")
+    if not known_dir.exists():
+        known_dir.mkdir(parents=True, exist_ok=True)
 
-    if not EMBEDDINGS_DB.exists():
-        st.info("No persons enrolled yet.\n\nRun: `python enroll_face.py --name 'Your Name' --capture`")
+    # Get subdirectories for each person
+    person_dirs = [d for d in known_dir.iterdir() if d.is_dir()]
+
+    if not person_dirs:
+        st.info("ℹ️ No persons enrolled yet.\n\nRun in terminal: `python3 enroll_face.py` or use interactive CLI.")
         return
 
-    try:
-        with open(EMBEDDINGS_DB, "rb") as f:
-            db = pickle.load(f)
-        cols = st.columns(4)
-        for i, (name, embeddings) in enumerate(db.items()):
-            with cols[i % 4]:
-                st.markdown(
-                    f'<div class="metric-card">'
-                    f'<div style="font-size:2em;text-align:center;">👤</div>'
-                    f'<div style="text-align:center;font-weight:600;color:#c9d1d9">{name}</div>'
-                    f'<div style="text-align:center;color:#8b949e;font-size:0.8em">{len(embeddings)} embedding(s)</div>'
-                    f'</div>',
-                    unsafe_allow_html=True,
-                )
-    except Exception as e:
-        st.error(f"Error loading person database: {e}")
+    st.caption("Click on any person's gallery to view all captured training photos.")
+
+    for p_dir in sorted(person_dirs, key=lambda d: d.name.lower()):
+        person_name = p_dir.name
+        photos = sorted(list(p_dir.glob("*.jpg")) + list(p_dir.glob("*.png")) + list(p_dir.glob("*.jpeg")))
+
+        # Card container for each person
+        with st.container():
+            col_photo, col_info, col_gallery = st.columns([1, 2, 4])
+
+            # 1. Primary Photo Thumbnail
+            with col_photo:
+                if photos:
+                    primary_img = cv2.imread(str(photos[0]))
+                    if primary_img is not None:
+                        primary_rgb = cv2.cvtColor(primary_img, cv2.COLOR_BGR2RGB)
+                        st.image(primary_rgb, use_container_width=True)
+                    else:
+                        st.markdown('<div style="font-size:3em;text-align:center;">👤</div>', unsafe_allow_html=True)
+                else:
+                    st.markdown('<div style="font-size:3em;text-align:center;">👤</div>', unsafe_allow_html=True)
+
+            # 2. Person Name & Photo Count Info
+            with col_info:
+                st.markdown(f"### 👤 {person_name}")
+                st.markdown(f"🖼️ **{len(photos)}** photo(s) captured")
+                st.markdown("✅ Status: **Authorized / Registered**")
+
+            # 3. Expandable Photo Gallery (Opens all photos when clicked)
+            with col_gallery:
+                with st.expander(f"📂 View All {len(photos)} Photos of {person_name}", expanded=False):
+                    if photos:
+                        g_cols = st.columns(4)
+                        for idx, p_path in enumerate(photos):
+                            g_img = cv2.imread(str(p_path))
+                            if g_img is not None:
+                                g_rgb = cv2.cvtColor(g_img, cv2.COLOR_BGR2RGB)
+                                with g_cols[idx % 4]:
+                                    st.image(g_rgb, caption=f"#{idx+1}", use_container_width=True)
+                    else:
+                        st.info("No photo files stored in folder.")
+
+        st.markdown("---")
 
 
 # ─── Main App ─────────────────────────────────────────────────────────────────
