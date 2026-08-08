@@ -1,0 +1,19 @@
+{
+  "_comment": "Define restricted zones as named polygon regions. Each zone has a name and a list of [x, y] pixel coordinates. Coordinates are relative to your camera resolution.",
+  "_tip": "Use the enroll_face.py --draw-zones flag to interactively draw zones on your camera feed.",
+  "resolution": [640, 480],
+  "zones": [
+    {
+      "name": "Main Entrance",
+      "color": [0, 0, 255],
+      "alert_priority": "HIGH",
+      "points": [[0, 0], [320, 0], [320, 240], [0, 240]]
+    },
+    {
+      "name": "Perimeter",
+      "color": [0, 165, 255],
+      "alert_priority": "MEDIUM",
+      "points": [[320, 0], [640, 0], [640, 480], [320, 480]]
+    }
+  ]
+}

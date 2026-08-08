@@ -1,0 +1,32 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+venv/
+env/
+ENV/
+.env
+
+# Database & Storage
+*.db
+*.sqlite3
+database/events.db
+database/face_embeddings.pkl
+database/snapshots/
+database/known_faces/*
+!database/known_faces/.gitkeep
+
+# Models & Weights
+*.pt
+*.onnx
+*.engine
+*.h5
+models/*.pt
+
+# IDEs & System
+.DS_Store
+.vscode/
+.idea/
+*.log

@@ -1,0 +1,54 @@
+{
+  "detection": {
+    "confidence_threshold": 0.5,
+    "person_classes": ["person"],
+    "animal_classes": ["dog", "cat", "horse", "sheep", "cow", "elephant", "bear", "zebra", "giraffe", "bird"],
+    "vehicle_classes": ["car", "motorcycle", "bicycle", "bus", "truck"],
+    "harmful_animals": ["bear", "elephant", "snake"]
+  },
+  "face_recognition": {
+    "model": "ArcFace",
+    "detector_backend": "opencv",
+    "distance_metric": "cosine",
+    "match_threshold": 0.42,
+    "grassmann_frames": 10,
+    "min_face_size": 40
+  },
+  "tracking": {
+    "track_thresh": 0.5,
+    "track_buffer": 30,
+    "match_thresh": 0.8
+  },
+  "motion": {
+    "enabled": true,
+    "history": 500,
+    "var_threshold": 50,
+    "detect_shadows": true,
+    "min_area": 5000
+  },
+  "night_vision": {
+    "enabled": true,
+    "brightness_threshold": 80,
+    "clahe_clip_limit": 3.0,
+    "clahe_tile_grid": [8, 8],
+    "gamma": 1.5
+  },
+  "loitering": {
+    "enabled": true,
+    "threshold_seconds": 30,
+    "alert_interval_seconds": 60
+  },
+  "alerts": {
+    "cooldown_seconds": 30,
+    "save_snapshots": true,
+    "snapshot_dir": "database/snapshots",
+    "play_alarm": true,
+    "send_telegram": true
+  },
+  "display": {
+    "show_fps": true,
+    "show_zones": true,
+    "show_tracking_ids": true,
+    "window_name": "Intruder Detection System"
+  }
+}
