@@ -56,24 +56,31 @@ st.markdown("""
     }
 
     /* Modern Glassmorphic Buttons */
-    .stButton > button, button[kind="secondary"], button[kind="primary"] {
+    .stButton > button {
         background: rgba(255, 255, 255, 0.03) !important;
-        color: #F3F4F6 !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        border-radius: 10px !important;
-        padding: 8px 18px !important;
+        color: #94A3B8 !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 12px !important;
+        padding: 10px 20px !important;
         font-weight: 600 !important;
-        font-size: 0.88em !important;
+        font-size: 0.92em !important;
         transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
-        backdrop-filter: blur(10px) !important;
+        backdrop-filter: blur(12px) !important;
     }
     .stButton > button:hover {
-        background: rgba(56, 189, 248, 0.12) !important;
-        border-color: rgba(56, 189, 248, 0.4) !important;
-        color: #38BDF8 !important;
+        background: rgba(255, 255, 255, 0.08) !important;
+        color: #F8FAFC !important;
+        border-color: rgba(255, 255, 255, 0.2) !important;
         transform: translateY(-1px) !important;
-        box-shadow: 0 0 20px rgba(56, 189, 248, 0.25) !important;
+    }
+
+    /* Active Glowing Glass Button */
+    button[kind="primary"], .stButton > button[kind="primary"] {
+        background: linear-gradient(135deg, rgba(14, 165, 233, 0.2), rgba(99, 102, 241, 0.2)) !important;
+        color: #38BDF8 !important;
+        border: 1px solid rgba(56, 189, 248, 0.5) !important;
+        box-shadow: 0 0 25px rgba(56, 189, 248, 0.25) !important;
+        font-weight: 700 !important;
     }
 
     /* Glassmorphic Metric Stat Cards */
@@ -694,27 +701,53 @@ def main():
 
     st.markdown("---")
 
-    # Tabs for different sections
-    tab1, tab2, tab3, tab4 = st.tabs(["Live Feed", "Event Log", "Analytics", "Enrolled Directory"])
+    if "active_tab" not in st.session_state:
+        st.session_state["active_tab"] = "Live Feed"
 
-    with tab1:
+    # Glassmorphic Custom Button Nav Bar
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        is_act = st.session_state["active_tab"] == "Live Feed"
+        if st.button("📹 Live Camera Feed", key="nav_live", use_container_width=True, type="primary" if is_act else "secondary"):
+            st.session_state["active_tab"] = "Live Feed"
+            st.rerun()
+
+    with col2:
+        is_act = st.session_state["active_tab"] == "Event Log"
+        if st.button("📋 Event Audit Logs", key="nav_log", use_container_width=True, type="primary" if is_act else "secondary"):
+            st.session_state["active_tab"] = "Event Log"
+            st.rerun()
+
+    with col3:
+        is_act = st.session_state["active_tab"] == "Analytics"
+        if st.button("📊 Security Analytics", key="nav_analytics", use_container_width=True, type="primary" if is_act else "secondary"):
+            st.session_state["active_tab"] = "Analytics"
+            st.rerun()
+
+    with col4:
+        is_act = st.session_state["active_tab"] == "Enrolled Directory"
+        if st.button("👥 Enrolled Directory", key="nav_enrolled", use_container_width=True, type="primary" if is_act else "secondary"):
+            st.session_state["active_tab"] = "Enrolled Directory"
+            st.rerun()
+
+    st.markdown("<div style='margin-bottom: 20px;'></div>", unsafe_allow_html=True)
+
+    current_tab = st.session_state["active_tab"]
+    if current_tab == "Live Feed":
         render_live_feed()
-
-    with tab2:
+    elif current_tab == "Event Log":
         try:
             db = get_db()
             render_event_log(db)
         except Exception as e:
             st.error(f"Error loading events: {e}")
-
-    with tab3:
+    elif current_tab == "Analytics":
         try:
             db = get_db()
             render_analytics(db)
         except Exception as e:
             st.error(f"Error loading analytics: {e}")
-
-    with tab4:
+    elif current_tab == "Enrolled Directory":
         render_enrolled_persons()
 
     # Auto-refresh
