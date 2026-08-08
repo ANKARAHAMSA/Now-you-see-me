@@ -200,6 +200,7 @@ def run_detection(config: dict, args: argparse.Namespace):
     face_cache: dict[int, tuple[str, float]] = {}  # track_id -> (name, distance)
     pending_checks: set[int] = set()
     last_submit_time: dict[int, float] = {}
+    first_seen_time: dict[int, float] = {}
     FACE_CHECK_INTERVAL = 1.5
 
     def _face_worker():
@@ -317,9 +318,16 @@ def run_detection(config: dict, args: argparse.Namespace):
                     det.class_name = name
                     label = name
 
+                    # Track when person ID was first seen
+                    if track_id is not None and track_id not in first_seen_time:
+                        first_seen_time[track_id] = now
+
+                    track_duration = (now - first_seen_time.get(track_id, now)) if track_id is not None else 2.0
+
                     if name == "UNKNOWN":
                         color_key = "intruder"
-                        if violated_zones or True:  # Alert for any unknown person
+                        # Only trigger intruder alert after 1.2s grace period to allow face recognition worker to run
+                        if track_duration >= 1.2:
                             alerts.trigger(
                                 event_type="intruder",
                                 label=f"UNKNOWN (ID:{det.track_id})",
