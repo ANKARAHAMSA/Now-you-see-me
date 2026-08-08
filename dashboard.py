@@ -132,28 +132,38 @@ st.markdown("""
         backdrop-filter: blur(10px) !important;
     }
 
-    /* Glassmorphic Tabs */
+    /* Glassmorphic Tabs — Vercel / Apple Dark Pill Bar */
+    [data-baseweb="tab-highlight"], [data-baseweb="tab-border"] {
+        display: none !important;
+    }
     .stTabs [data-baseweb="tab-list"] {
-        gap: 6px;
-        background-color: rgba(17, 24, 39, 0.4);
-        padding: 5px;
-        border-radius: 14px;
-        border: 1px solid rgba(255, 255, 255, 0.05);
+        gap: 8px !important;
+        background-color: rgba(15, 23, 42, 0.6) !important;
+        padding: 6px !important;
+        border-radius: 14px !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        backdrop-filter: blur(16px) !important;
     }
     .stTabs [data-baseweb="tab"] {
-        height: 40px;
-        border-radius: 9px;
-        color: #9CA3AF;
-        font-weight: 600;
-        font-size: 0.88em;
+        height: 44px !important;
+        border-radius: 10px !important;
+        color: #94A3B8 !important;
+        font-weight: 600 !important;
+        font-size: 0.92em !important;
         border: none !important;
-        padding: 0 16px;
+        padding: 0 22px !important;
+        background: transparent !important;
+        transition: all 0.2s ease !important;
+    }
+    .stTabs [data-baseweb="tab"]:hover {
+        color: #F8FAFC !important;
+        background: rgba(255, 255, 255, 0.05) !important;
     }
     .stTabs [aria-selected="true"] {
-        background: rgba(56, 189, 248, 0.15) !important;
-        color: #38BDF8 !important;
-        border: 1px solid rgba(56, 189, 248, 0.3) !important;
-        box-shadow: 0 4px 16px rgba(56, 189, 248, 0.2);
+        background: #0EA5E9 !important;
+        color: #FFFFFF !important;
+        font-weight: 700 !important;
+        box-shadow: 0 4px 20px rgba(14, 165, 233, 0.4) !important;
     }
 
     /* Section headers */
@@ -685,7 +695,7 @@ def main():
     st.markdown("---")
 
     # Tabs for different sections
-    tab1, tab2, tab3, tab4 = st.tabs(["📹 Live Feed", "📋 Event Log", "📊 Analytics", "👥 Enrolled Persons"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Live Feed", "Event Log", "Analytics", "Enrolled Directory"])
 
     with tab1:
         render_live_feed()
