@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🛡️ Now You See Me — Real-Time AI Intruder Detection System
+# 👁️ Now You See Me — Real-Time AI Security & Intruder Detection System
 
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![YOLOv8](https://img.shields.io/badge/Object_Detection-YOLOv8-000000?style=for-the-badge&logo=ultralytics&logoColor=white)](https://ultralytics.com)
@@ -8,7 +8,7 @@
 [![Streamlit](https://img.shields.io/badge/Dashboard-Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
 
-*A production-grade, AI-driven home & perimeter security suite featuring real-time face recognition, animal/vehicle classification, loitering detection, restricted zone monitoring, non-blocking Telegram alerts, and an interactive web dashboard.*
+*⚡ Next-generation AI security suite featuring 60 FPS ArcFace face recognition, YOLOv8 multi-class detection, ByteTrack tracking, loitering analysis, restricted zone monitoring, async Telegram alerts, and an interactive Streamlit command center.*
 
 [Features](#-key-features) • [Architecture](#-system-architecture) • [Quick Start](#-quick-start) • [Face Enrollment](#-face-enrollment) • [Web Dashboard](#-stream-dashboard) • [Configuration](#-configuration)
 
