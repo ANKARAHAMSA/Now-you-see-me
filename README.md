@@ -6,11 +6,12 @@
 [![YOLOv8](https://img.shields.io/badge/Object_Detection-YOLOv8-000000?style=for-the-badge&logo=ultralytics&logoColor=white)](https://ultralytics.com)
 [![DeepFace](https://img.shields.io/badge/Face_Recognition-ArcFace-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white)](https://github.com/serengil/deepface)
 [![Streamlit](https://img.shields.io/badge/Dashboard-Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io)
+[![Telegram](https://img.shields.io/badge/Alerts-Telegram_Bot-26A5E4?style=for-the-badge&logo=telegram&logoColor=white)](docs/TELEGRAM_GUIDE.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
 
-*⚡ Next-generation AI security suite featuring 60 FPS ArcFace face recognition, YOLOv8 multi-class detection, ByteTrack tracking, loitering analysis, restricted zone monitoring, async Telegram alerts, and an interactive Streamlit command center.*
+*⚡ Next-generation AI security suite featuring 60 FPS ArcFace face recognition, 2D FFT Face Anti-Spoofing, Armed/Disarmed security modes, CSV/Report exporter, Rapid 30-photo auto-enrollment, YOLOv8 multi-class detection, ByteTrack tracking, Telegram photo alerts, and an interactive Streamlit command center.*
 
-[Features](#-key-features) • [Architecture](#-system-architecture) • [Quick Start](#-quick-start) • [Face Enrollment](#-face-enrollment) • [Web Dashboard](#-stream-dashboard) • [Configuration](#-configuration)
+[Features](#-key-features) • [Architecture](#-system-architecture) • [Quick Start](#-quick-start) • [Telegram Bot](#-telegram-bot-setup) • [Face Enrollment](#-face-enrollment) • [Web Dashboard](#-streamlit-dashboard) • [Testing](#-automated-unit-testing)
 
 </div>
 
@@ -18,9 +19,9 @@
 
 ## 📸 Overview
 
-**Now You See Me** turns any ordinary webcam or IP security camera into a smart, autonomous security sentinel. By combining ultra-fast **YOLOv8** object detection, **ByteTrack** multi-object tracking, and **ArcFace** deep facial recognition, the system accurately distinguishes between authorized family/staff members and unknown intruders.
+**Now You See Me** turns any ordinary laptop camera, webcam, or IP security camera into an autonomous security sentinel. By combining ultra-fast **YOLOv8** object detection, **ByteTrack** multi-object tracking, **ArcFace** deep facial recognition, and **2D FFT Moiré Anti-Spoofing**, the system accurately distinguishes between authorized family/staff members and unknown intruders.
 
-```
+```text
        +-------------------------------------------------------------+
        |                  INPUT: Camera Feed (Webcam/IP)             |
        +-------------------------------------------------------------+
@@ -44,18 +45,18 @@
        +-------------------------------------------------------------+
        |               ByteTrack Multi-Object Tracking               |
        +-------------------------------------------------------------+
-                 /                    |                    \
-                /                     |                     \
-               v                      v                      v
-    +-------------------+    +------------------+   +-------------------+
-    | Face Recognition  |    | Loitering Check  |   | Restricted Zones  |
-    | (ArcFace + Async) |    | (Dwell-Time)     |   | (Polygon Overlay) |
-    +-------------------+    +------------------+   +-------------------+
-               \                      |                     /
-                \                     |                    /
-                 v                    v                   v
+                  /                    |                    \
+                 /                     |                     \
+                v                      v                      v
+     +-------------------+    +------------------+   +-------------------+
+     | Face Recognition  |    | Anti-Spoofing    |   | Security Modes    |
+     | (ArcFace + Async) |    | (2D FFT Moiré)   |   | (Armed/Disarmed)  |
+     +-------------------+    +------------------+   +-------------------+
+                \                      |                     /
+                 \                     |                    /
+                  v                    v                   v
        +-------------------------------------------------------------+
-       |            Alert Engine (Telegram + Audio Alarm + DB)       |
+       |         Alert Engine (Telegram Photo + Audio Alarm + DB)    |
        +-------------------------------------------------------------+
 ```
 
@@ -63,14 +64,15 @@
 
 ## ✨ Key Features
 
-- ⚡ **Zero-Lag High FPS Stream:** Threaded async face recognition and frame-interleaving deliver a smooth **30–60 FPS** camera feed.
-- 👤 **ArcFace Facial Recognition:** High-accuracy 512-D face embeddings eliminate false positives and distinguish known individuals from unknown intruders.
-- 🐶 **Animal & Vehicle Classification:** Automatically identifies animals (safe vs. dangerous like bears/elephants) and vehicles (cars, motorcycles).
-- ⏱️ **Dwell-Time Loitering Alerts:** Monitors how long individuals stand around. Triggers high-priority loitering alarms after a configurable threshold (e.g. 30s).
-- 📍 **Custom Polygon Restricted Zones:** Define custom restricted zones (e.g., Main Entrance, Perimeter). Entering restricted areas escalates alert priority instantly.
-- 🌙 **Adaptive Night Vision:** Automatically activates CLAHE (Contrast Limited Adaptive Histogram Equalization) and gamma enhancement under low-light conditions.
-- 📱 **Async Telegram Notifications:** Instantly sends photo snapshots with bounding box overlays and metadata directly to your Telegram chat without freezing the video feed.
-- 📊 **Streamlit Command Center:** A sleek web dashboard to monitor live camera stats, review historical intruder logs, analyze analytics charts, and manage enrolled persons.
+- ⚡ **60 FPS Real-Time Performance:** Threaded async face recognition and 640px inference deliver a ultra-smooth camera feed.
+- 👤 **ArcFace Facial Recognition:** High-precision 512-D face vector embeddings (match threshold: `0.38`) accurately identify registered household members.
+- 👁️ **2D FFT Face Anti-Spoofing:** Analyzes high-frequency 2D Fourier Transform spectra and texture sharpness to detect paper prints or screen photo attacks, while ignoring mobile phones used naturally by real people.
+- 🔒 **Armed / Disarmed / Scheduled Modes:** Switch security modes on the fly via the web dashboard or enable automated night-time arming (e.g. 22:00 to 06:00).
+- ⚡ **Rapid 30-Photo Auto-Enrollment:** Captures 30 high-quality face crops in just **~4.5 seconds** (0.15s rapid-fire interval) for maximum training variation.
+- 📥 **CSV & Security Incident Report Exporter:** Download complete audit logs and executive security incident summaries directly from the dashboard.
+- 📱 **Async Telegram Notifications:** Instantly sends photo snapshots with annotated bounding boxes and alert metadata directly to your phone.
+- 👥 **Interactive Enrolled Persons Gallery:** View primary photo thumbnails, expand full 30-photo galleries, and delete single photos with automatic real-time embedding rebuilding.
+- 🌙 **Adaptive Night Vision:** Automatically activates CLAHE and gamma correction under poor lighting.
 
 ---
 
@@ -91,35 +93,30 @@ source venv/bin/activate    # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 2. Configure Settings (Optional)
+### 2. Configure Telegram & Credentials
 
-Copy the environment template:
+Run the automated Telegram setup tool:
 
 ```bash
-cp config/.env.example .env
+python3 test_telegram.py
 ```
 
-Edit `.env` to set your camera source (`0` for laptop webcam, or RTSP stream URL) and Telegram Bot credentials:
+- Enter your **Telegram Bot Token** (from `@BotFather`) and **Chat ID** (from `@userinfobot`).
+- It will verify the connection, send a test notification to your phone, and save credentials to `.env`.
 
-```ini
-CAMERA_SOURCE=0
-TELEGRAM_BOT_TOKEN=your_bot_token_here
-TELEGRAM_CHAT_ID=your_chat_id_here
-```
+### 3. Enroll Your Face (30-Photo Rapid Capture)
 
-### 3. Enroll Your Face
-
-Run the interactive face enrollment tool to register known household members:
+Run the interactive face enrollment tool:
 
 ```bash
 python3 enroll_face.py
 ```
 
 - Type your name (e.g., `shahin`)
-- Look at the camera — **auto-captures 15 frames automatically!**
-- The system encodes your face using ArcFace and saves it to the local secure database.
+- Look at the camera — **rapidly captures 30 frames in ~4.5 seconds!**
+- Embeddings are encoded using ArcFace and saved to `database/face_embeddings.pkl`.
 
-### 4. Run Security System
+### 4. Start Security Detection System
 
 ```bash
 python3 main.py
@@ -129,7 +126,7 @@ python3 main.py
 > - Press **`Q`** or **`ESC`** to quit.
 > - Press **`S`** to take a manual snapshot.
 
-### 5. Launch Web Dashboard
+### 5. Launch Web Command Center
 
 In a new terminal window:
 
@@ -137,41 +134,33 @@ In a new terminal window:
 streamlit run dashboard.py
 ```
 
-Open your browser at `http://localhost:8501` to view real-time logs and security analytics!
+Open your browser at `http://localhost:8501` to view live feeds, change security modes, and download security logs!
 
 ---
 
-## 👤 Face Enrollment CLI Usage
+## 📱 Telegram Bot Setup
 
-The `enroll_face.py` tool provides an intuitive interface for managing authorized faces:
+For a detailed step-by-step guide with screenshots, see [docs/TELEGRAM_GUIDE.md](docs/TELEGRAM_GUIDE.md).
 
 ```bash
-# Interactive mode (prompts for name & auto-captures from webcam):
-python3 enroll_face.py
-
-# Direct enrollment for a specific name:
-python3 enroll_face.py --name "Alex"
-
-# Enroll using existing photo files:
-python3 enroll_face.py --name "Sarah" --images photo1.jpg photo2.jpg
-
-# List all enrolled persons in database:
-python3 enroll_face.py --list
-
-# Remove a person from database:
-python3 enroll_face.py --remove "Alex"
+# Verify your Telegram Bot configuration anytime:
+python3 test_telegram.py
 ```
 
 ---
 
-## 📊 Streamlit Dashboard
+## 🧪 Automated Unit Testing
 
-The web dashboard (`dashboard.py`) includes:
+Run the full automated test suite:
 
-1. 📹 **Live Feed & Camera Controls:** Toggle detection modes (person, animal, vehicle) on the fly.
-2. 📋 **Event Audit Log:** Filter historical events by type, priority, or date, and view captured intruder snapshots.
-3. 📈 **Security Analytics:** Interactive Plotly charts displaying peak intruder activity hours and event breakdowns.
-4. 👥 **Enrolled Persons Directory:** Manage and verify registered household members.
+```bash
+python3 -m unittest discover tests
+```
+
+Tests included:
+- `tests/test_face_recognizer.py`: Unit tests for ArcFace embeddings and liveness anti-spoofing.
+- `tests/test_night_vision.py`: Unit tests for CLAHE low-light enhancement.
+- `tests/test_database.py`: Unit tests for thread-safe SQLite event logging.
 
 ---
 
@@ -180,28 +169,32 @@ The web dashboard (`dashboard.py`) includes:
 ```text
 Now-you-see-me/
 ├── main.py                  # 🚀 Main detection & tracking engine
-├── dashboard.py             # 📊 Streamlit web dashboard
-├── enroll_face.py           # 👤 Interactive face enrollment CLI
-├── requirements.txt         # 📦 Python package dependencies
+├── dashboard.py             # 📊 Streamlit web command center
+├── enroll_face.py           # 👤 Rapid 30-photo face enrollment CLI
+├── test_telegram.py         # 📱 Telegram connection setup & tester
+├── requirements.txt         # 📦 Dependencies list
 ├── config/
-│   ├── settings.json        # ⚙️ Detection thresholds & zone configs
-│   ├── zones.json           # 📍 Polygon zone coordinates
-│   └── .env.example         # 🔑 Telegram & environment template
+│   ├── settings.json        # ⚙️ Detection thresholds & security modes
+│   └── .env                 # 🔑 Private Telegram tokens & credentials
+├── docs/
+│   ├── ARCHITECTURE.md      # 🏗 Detailed technical pipeline design
+│   └── TELEGRAM_GUIDE.md    # 📱 Telegram bot integration guide
+├── tests/
+│   ├── test_face_recognizer.py # 🧪 ArcFace & Anti-spoofing unit test
+│   ├── test_night_vision.py    # 🧪 CLAHE night vision unit test
+│   └── test_database.py        # 🧪 SQLite DB logger unit test
 ├── core/
 │   ├── detector.py          # 🎯 YOLOv8 multi-class detection
-│   ├── face_recognizer.py   # 🧠 ArcFace 512-D face recognition
+│   ├── face_recognizer.py   # 🧠 ArcFace 512-D recognition & 2D FFT Anti-Spoofing
 │   ├── tracker.py           # 🔄 ByteTrack multi-object tracking
-│   ├── motion_detector.py   # 🏃 MOG2 motion gating
 │   ├── night_vision.py      # 🌙 CLAHE low-light enhancement
-│   ├── loitering_detector.py# ⏱️ Dwell-time monitoring
-│   └── zone_manager.py      # 📍 Polygon zone checking
+│   └── loitering_detector.py# ⏱️ Dwell-time monitoring
 ├── alerts/
 │   ├── alert_manager.py     # 🔔 Alert orchestrator
-│   ├── telegram_alert.py    # 📱 Async Telegram Bot notifier
-│   └── alarm.py             # 🔊 Audio alarm sound generator
+│   └── telegram_alert.py    # 📱 Async Telegram Bot notifier
 └── database/
     ├── db_manager.py        # 🗄️ SQLite event database logging
-    └── known_faces/         # 📁 Enrolled face embeddings & crops
+    └── known_faces/         # 📁 Enrolled face photos & embeddings
 ```
 
 ---
@@ -211,16 +204,11 @@ Now-you-see-me/
 | Setting | Default | Description |
 |---|---|---|
 | `confidence_threshold` | `0.50` | YOLOv8 object detection confidence cutoff |
-| `match_threshold` | `0.42` | Strict ArcFace cosine distance threshold (lower = stricter) |
-| `loitering_threshold_seconds` | `30` | Time (in seconds) before flagging loitering |
-| `detector_backend` | `opencv` | Fast face detector backend |
+| `match_threshold` | `0.38` | Strict ArcFace cosine distance threshold (lower = stricter) |
+| `armed_mode` | `"ARMED"` | System security mode (`ARMED`, `DISARMED`, `SCHEDULED`) |
+| `schedule_start` / `end` | `"22:00"` / `"06:00"` | Automated night-time arming hours |
+| `detector_backend` | `"opencv"` | Fast face crop detector backend |
 | `alert_cooldown` | `30.0` | Cooldown period between repetitive alerts (seconds) |
-
----
-
-## 🤝 Contributing
-
-Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/ANKARAHAMSA/Now-you-see-me/issues).
 
 ---
 
