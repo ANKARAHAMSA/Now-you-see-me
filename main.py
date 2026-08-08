@@ -296,11 +296,13 @@ def run_detection(config: dict, args: argparse.Namespace):
                 if det.category == "person":
                     track_id = det.track_id
 
+                    # Extract face crop
+                    face_crop = _get_face_crop_for_person(frame, det.bbox, face_boxes)
+
                     # Check if we need to submit face for async recognition
                     if track_id is not None:
                         last_t = last_submit_time.get(track_id, 0.0)
                         if (now - last_t > FACE_CHECK_INTERVAL) and (track_id not in pending_checks):
-                            face_crop = _get_face_crop_for_person(frame, det.bbox, face_boxes)
                             if face_crop is not None:
                                 try:
                                     pending_checks.add(track_id)
@@ -309,11 +311,13 @@ def run_detection(config: dict, args: argparse.Namespace):
                                 except queue.Full:
                                     pending_checks.discard(track_id)
 
-                    # Lookup cached face recognition result (0ms delay!)
-                    if track_id is not None and track_id in face_cache:
+                    # Lookup cached face recognition result ONLY if face crop is valid
+                    if track_id is not None and track_id in face_cache and face_crop is not None:
                         name, distance = face_cache[track_id]
                     else:
                         name, distance = "UNKNOWN", 1.0
+                        if track_id is not None and face_crop is None:
+                            face_cache.pop(track_id, None)
 
                     det.class_name = name
                     label = name
