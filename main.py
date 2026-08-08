@@ -339,18 +339,18 @@ def run_detection(config: dict, args: argparse.Namespace):
                         color_key = "known"
                         label = f"✓ {name}"
 
-                    # Loitering alert
-                    if det.track_id in loiterers:
+                    # Loitering alert (only for UNKNOWN intruders, not registered members)
+                    if name == "UNKNOWN" and det.track_id in loiterers:
                         dwell = loitering.get_dwell_time(det.track_id)
                         alerts.trigger(
                             event_type="loitering",
-                            label=f"{name} (ID:{det.track_id})",
+                            label=f"UNKNOWN (ID:{det.track_id})",
                             frame=display_frame,
                             zone_name=zone_name,
                             priority="HIGH",
                             notes=f"Dwell time: {dwell:.0f}s",
                         )
-                        active_alert_banner = (f"LOITERING: {dwell:.0f}s", "intruder")
+                        active_alert_banner = (f"UNKNOWN LOITERING: {dwell:.0f}s", "intruder")
                         banner_until = time.time() + 5.0
 
                 # ── Animal Detection ───────────────────────────────────────
