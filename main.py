@@ -413,6 +413,14 @@ def run_detection(config: dict, args: argparse.Namespace):
             fps_counter = 0
             fps_start = time.time()
 
+        # ── Save live frame for Web Dashboard streaming ───────────────────
+        try:
+            live_stream_path = Path("database/snapshots/live_stream.jpg")
+            live_stream_path.parent.mkdir(parents=True, exist_ok=True)
+            cv2.imwrite(str(live_stream_path), display_frame)
+        except Exception:
+            pass
+
         # ── Display ───────────────────────────────────────────────────────
         if show_display:
             cv2.imshow(window_name, display_frame)

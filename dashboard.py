@@ -225,16 +225,34 @@ def render_live_feed():
         st.checkbox("🌙 Night Vision", value=True)
         st.checkbox("📍 Zone Monitoring", value=True)
 
-    # Show latest snapshot from database/snapshots/ or camera capture
+    # Live video stream from database/snapshots/live_stream.jpg
+    live_stream_file = Path("database/snapshots/live_stream.jpg")
     snapshots_dir = Path("database/snapshots")
-    recent_snapshots = sorted(list(snapshots_dir.glob("*.jpg")), key=lambda p: p.stat().st_mtime, reverse=True) if snapshots_dir.exists() else []
 
-    if recent_snapshots:
-        latest_img = recent_snapshots[0]
-        mtime = datetime.fromtimestamp(latest_img.stat().st_mtime).strftime("%H:%M:%S")
-        feed_placeholder.image(str(latest_img), caption=f"📸 Latest Detection Snapshot ({latest_img.name} at {mtime})", use_column_width=True)
+    if live_stream_file.exists() and (time.time() - live_stream_file.stat().st_mtime < 5.0):
+        feed_placeholder.image(
+            str(live_stream_file),
+            caption=f"🔴 LIVE CAMERA FEED — {datetime.now().strftime('%H:%M:%S')}",
+            use_container_width=True,
+        )
+        if auto_refresh:
+            time.sleep(0.1)
+            st.rerun()
+    elif snapshots_dir.exists():
+        recent_snapshots = sorted(list(snapshots_dir.glob("*.jpg")), key=lambda p: p.stat().st_mtime, reverse=True)
+        recent_snapshots = [p for p in recent_snapshots if p.name != "live_stream.jpg"]
+        if recent_snapshots:
+            latest_img = recent_snapshots[0]
+            mtime = datetime.fromtimestamp(latest_img.stat().st_mtime).strftime("%H:%M:%S")
+            feed_placeholder.image(
+                str(latest_img),
+                caption=f"📸 Latest Detection Snapshot ({latest_img.name} at {mtime})",
+                use_container_width=True,
+            )
+        else:
+            feed_placeholder.info("💡 Run `python3 main.py` in terminal to view live video stream!")
     else:
-        feed_placeholder.info("💡 Camera is running under `main.py`. Start `python3 main.py` to generate live events & snapshots!")
+        feed_placeholder.info("💡 Run `python3 main.py` in terminal to view live video stream!")
 
 
 def render_event_log(db):
@@ -264,30 +282,27 @@ def render_event_log(db):
     with col3:
         search = st.text_input("Search label", "")
 
-    filtered = df[
-        df["event_type"].isin(type_filter) &
-        df["priority"].isin(priority_filter)
-    ]
+    filtered_df = df.copy()
+    if type_filter:
+        filtered_df = filtered_df[filtered_df["event_type"].isin(type_filter)]
+    if priority_filter:
+        filtered_df = filtered_df[filtered_df["priority"].isin(priority_filter)]
     if search:
-        filtered = filtered[filtered["label"].str.contains(search, case=False, na=False)]
+        filtered_df = filtered_df[filtered_df["label"].str.contains(search, case=False, na=False)]
 
-    # Display table
-    display_cols = ["timestamp", "event_type", "label", "confidence", "zone_name", "priority"]
-    available_cols = [c for c in display_cols if c in filtered.columns]
     st.dataframe(
-        filtered[available_cols].head(50),
+        filtered_df[["id", "timestamp", "event_type", "label", "priority", "zone_name", "confidence"]],
         use_container_width=True,
-        height=350,
+        hide_index=True,
     )
 
-    # Snapshot gallery
-    if "snapshot" in filtered.columns:
-        st.markdown('<div class="section-header">🖼 Recent Snapshots</div>', unsafe_allow_html=True)
-        snaps = filtered[filtered["snapshot"].str.len() > 0]["snapshot"].head(8).tolist()
-        if snaps:
+    # Snapshot Gallery
+    st.markdown("### 📸 Event Snapshots")
+    if "snapshot" in filtered_df.columns:
+        snapshot_events = filtered_df[filtered_df["snapshot"].str.len() > 0].head(8)
+
+        if not snapshot_events.empty:
             cols = st.columns(4)
-            for i, snap_path in enumerate(snaps):
-                path = Path(snap_path)
                 if path.exists():
                     img = cv2.imread(str(path))
                     if img is not None:
