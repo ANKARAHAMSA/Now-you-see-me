@@ -230,11 +230,14 @@ def render_live_feed():
     snapshots_dir = Path("database/snapshots")
 
     if live_stream_file.exists() and (time.time() - live_stream_file.stat().st_mtime < 5.0):
-        feed_placeholder.image(
-            str(live_stream_file),
-            caption=f"🔴 LIVE CAMERA FEED — {datetime.now().strftime('%H:%M:%S')}",
-            use_container_width=True,
-        )
+        try:
+            feed_placeholder.image(
+                str(live_stream_file),
+                caption=f"🔴 LIVE CAMERA FEED — {datetime.now().strftime('%H:%M:%S')}",
+                use_container_width=True,
+            )
+        except Exception:
+            pass
         if auto_refresh:
             time.sleep(0.1)
             st.rerun()
