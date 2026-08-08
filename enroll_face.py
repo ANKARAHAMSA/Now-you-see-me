@@ -95,10 +95,10 @@ def cmd_enroll_images(rec: FaceRecognizer, name: str, image_paths: list[str]):
         print(f"\n  ✗ Could not extract face embeddings. Ensure images contain clear, frontal faces.")
 
 
-def cmd_capture(rec: FaceRecognizer, name: str, n_frames: int = 15):
+def cmd_capture(rec: FaceRecognizer, name: str, n_frames: int = 30):
     """
     AUTO-capture face images directly from webcam for enrollment.
-    Automatically captures when a face is detected — no SPACE needed!
+    Automatically captures 30 frames rapidly when a face is detected!
     """
     cap = cv2.VideoCapture(0)
     if not cap.isOpened():
@@ -112,15 +112,15 @@ def cmd_capture(rec: FaceRecognizer, name: str, n_frames: int = 15):
         cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
     )
 
-    print(f"\n  📷 Auto-capturing {n_frames} frames for '{name}'")
-    print("  ✅ Just look at the camera — capturing starts automatically!")
+    print(f"\n  📷 Rapid Auto-capturing {n_frames} frames for '{name}'")
+    print("  ✅ Just look at the camera — rapid capturing starts automatically!")
     print("  Press Q to finish early, ESC to cancel\n")
 
     captured = []
     last_capture_time = 0.0
-    capture_interval = 0.6        # Auto-capture every 0.6 seconds when face detected
+    capture_interval = 0.15       # Rapid-fire auto-capture every 0.15 seconds (6.6 photos/sec!)
     face_stable_since = 0.0       # Track how long face has been visible
-    stable_required = 0.5         # Face must be stable for 0.5s before first capture
+    stable_required = 0.2         # Face must be visible for only 0.2s before capturing
 
     cv2.namedWindow("Enrollment — Auto Capture", cv2.WINDOW_NORMAL)
 
@@ -249,7 +249,7 @@ def main():
     parser.add_argument("--images", nargs="+", help="Image file paths")
     parser.add_argument("--list", action="store_true", help="List enrolled persons")
     parser.add_argument("--remove", type=str, help="Remove person from database")
-    parser.add_argument("--frames", type=int, default=15, help="Frames to auto-capture (default: 15)")
+    parser.add_argument("--frames", type=int, default=30, help="Frames to auto-capture (default: 30)")
     args = parser.parse_args()
 
     config = load_config()
