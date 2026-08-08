@@ -200,6 +200,43 @@ class FaceRecognizer:
         self.save_embeddings()
         logger.info(f"Rebuilt database for '{name}': {len(embeddings)} embedding(s) remaining.")
 
+    # ─── Anti-Spoofing & Liveness Detection ───────────────────────────────────
+
+    def check_liveness(self, face_crop: np.ndarray) -> tuple[bool, float, str]:
+        """
+        Analyze face crop to detect paper/screen photo spoof attacks.
+
+        Returns:
+            (is_live: bool, liveness_score: float, reason: str)
+        """
+        if face_crop is None or face_crop.size == 0:
+            return False, 0.0, "Empty crop"
+
+        import cv2
+        gray = cv2.cvtColor(face_crop, cv2.COLOR_BGR2GRAY)
+
+        # 1. Texture Blur / Sharpness check via Laplacian Variance
+        lap_var = cv2.Laplacian(gray, cv2.CV_64F).var()
+
+        # 2. Specular Screen Glare & High-Brightness Pixel Ratio
+        bright_pixels = np.sum(gray > 245) / float(gray.size)
+
+        # 3. Color Saturation Uniformity (Screens have artificial backlight saturation)
+        hsv = cv2.cvtColor(face_crop, cv2.COLOR_BGR2HSV)
+        sat_std = float(np.std(hsv[:, :, 1]))
+
+        # Screen photo attacks typically exhibit extreme specular glare (> 4% bright pixels)
+        # or flat artificial color saturation (sat_std < 12)
+        if bright_pixels > 0.05:
+            return False, 0.2, "Screen Glare Detected"
+        if sat_std < 10.0:
+            return False, 0.3, "Artificial Screen Color"
+
+        liveness_score = min(1.0, lap_var / 120.0)
+        is_live = liveness_score > 0.35
+
+        return is_live, liveness_score, "Live Face" if is_live else "Unnatural Texture"
+
     # ─── Recognition ─────────────────────────────────────────────────────────
 
     def extract_embedding(self, face_crop: np.ndarray) -> Optional[np.ndarray]:

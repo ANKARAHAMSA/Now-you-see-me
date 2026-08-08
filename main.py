@@ -80,6 +80,36 @@ def get_color_key(detection) -> str:
     return "intruder"
 
 
+def is_system_armed(config: dict) -> bool:
+    """Check if security system is ARMED based on settings.json mode or schedule."""
+    try:
+        cfg = load_config()
+        sec = cfg.get("system_security", {})
+        mode = sec.get("armed_mode", "ARMED")
+
+        if mode == "DISARMED":
+            return False
+        if mode == "ARMED":
+            return True
+
+        if mode == "SCHEDULED":
+            from datetime import datetime, time as dt_time
+            now_t = datetime.now().time()
+            s_h, s_m = map(int, sec.get("schedule_start", "22:00").split(":"))
+            e_h, e_m = map(int, sec.get("schedule_end", "06:00").split(":"))
+
+            start_t = dt_time(s_h, s_m)
+            end_t = dt_time(e_h, e_m)
+
+            if start_t > end_t:  # Overnight schedule e.g. 22:00 to 06:00
+                return now_t >= start_t or now_t <= end_t
+            else:
+                return start_t <= now_t <= end_t
+    except Exception:
+        pass
+    return True
+
+
 # ── Face detection helpers ─────────────────────────────────────────────────────
 
 _FACE_CASCADE = cv2.CascadeClassifier(
@@ -211,10 +241,16 @@ def run_detection(config: dict, args: argparse.Namespace):
                     break
                 tid, f_crop = item
                 try:
-                    emb = face_rec.extract_embedding(f_crop)
-                    if emb is not None:
-                        name, dist = face_rec.identify(emb, tid)
-                        face_cache[tid] = (name, dist)
+                    # Check Liveness / Anti-Spoofing
+                    is_live, liveness_score, reason = face_rec.check_liveness(f_crop)
+                    if not is_live:
+                        logger.warning(f"Anti-spoofing triggered for ID {tid}: {reason}")
+                        face_cache[tid] = ("SPOOF ATTACK!", 1.0)
+                    else:
+                        emb = face_rec.extract_embedding(f_crop)
+                        if emb is not None:
+                            name, dist = face_rec.identify(emb, tid)
+                            face_cache[tid] = (name, dist)
                 except Exception as e:
                     logger.debug(f"Async face worker error: {e}")
                 finally:
@@ -328,26 +364,27 @@ def run_detection(config: dict, args: argparse.Namespace):
 
                     track_duration = (now - first_seen_time.get(track_id, now)) if track_id is not None else 2.0
 
-                    if name == "UNKNOWN":
+                    if name == "UNKNOWN" or name == "SPOOF ATTACK!":
                         color_key = "intruder"
-                        # Only trigger intruder alert after 1.2s grace period to allow face recognition worker to run
-                        if track_duration >= 1.2:
+                        label = name if name == "SPOOF ATTACK!" else "UNKNOWN"
+                        # Only trigger intruder alert if system is ARMED and after 1.2s grace period
+                        if track_duration >= 1.2 and is_system_armed(config):
                             alerts.trigger(
-                                event_type="intruder",
-                                label=f"UNKNOWN (ID:{det.track_id})",
+                                event_type="intruder" if name != "SPOOF ATTACK!" else "spoof_attack",
+                                label=f"{label} (ID:{det.track_id})",
                                 frame=display_frame,
                                 confidence=1.0 - distance,
                                 zone_name=zone_name,
-                                priority=priority,
+                                priority="HIGH" if name == "SPOOF ATTACK!" else priority,
                             )
-                            active_alert_banner = (f"INTRUDER DETECTED{' in ' + zone_name if zone_name else ''}", "intruder")
+                            active_alert_banner = (f"{label} DETECTED{' in ' + zone_name if zone_name else ''}", "intruder")
                             banner_until = time.time() + 5.0
                     else:
                         color_key = "known"
                         label = f"OK {name}"
 
-                    # Loitering alert (only for UNKNOWN intruders, not registered members)
-                    if name == "UNKNOWN" and det.track_id in loiterers:
+                    # Loitering alert (only for UNKNOWN intruders when ARMED)
+                    if name == "UNKNOWN" and det.track_id in loiterers and is_system_armed(config):
                         dwell = loitering.get_dwell_time(det.track_id)
                         alerts.trigger(
                             event_type="loitering",

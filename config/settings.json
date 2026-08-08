@@ -50,5 +50,15 @@
     "show_zones": false,
     "show_tracking_ids": true,
     "window_name": "Intruder Detection System"
+  },
+  "system_security": {
+    "armed_mode": "ARMED",
+    "schedule_start": "22:00",
+    "schedule_end": "06:00"
+  },
+  "anti_spoofing": {
+    "enabled": true,
+    "laplacian_threshold": 65.0,
+    "reflection_threshold": 0.85
   }
 }

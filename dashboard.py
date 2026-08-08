@@ -130,6 +130,30 @@ def render_sidebar():
         st.sidebar.warning("Set TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID in your .env file")
 
     st.sidebar.markdown("---")
+    st.sidebar.markdown("### 🔒 Security System Status")
+    cfg = get_config()
+    current_mode = cfg.get("system_security", {}).get("armed_mode", "ARMED")
+
+    mode_selection = st.sidebar.radio(
+        "Select Security Mode:",
+        ["🟢 ARMED", "🟡 SCHEDULED", "⚪ DISARMED"],
+        index=0 if current_mode == "ARMED" else (1 if current_mode == "SCHEDULED" else 2)
+    )
+
+    new_mode = "ARMED" if "ARMED" in mode_selection else ("SCHEDULED" if "SCHEDULED" in mode_selection else "DISARMED")
+
+    if new_mode != current_mode:
+        cfg_path = Path("config/settings.json")
+        if cfg_path.exists():
+            with open(cfg_path, "r") as f:
+                data = json.load(f)
+            data.setdefault("system_security", {})["armed_mode"] = new_mode
+            with open(cfg_path, "w") as f:
+                json.dump(data, f, indent=2)
+            st.sidebar.success(f"Mode updated to {new_mode}!")
+            st.rerun()
+
+    st.sidebar.markdown("---")
     st.sidebar.markdown("### ⚙️ Quick Settings")
 
     cooldown = st.sidebar.slider("Alert Cooldown (s)", 5, 120, 30)
@@ -292,6 +316,30 @@ def render_event_log(db):
         filtered_df = filtered_df[filtered_df["priority"].isin(priority_filter)]
     if search:
         filtered_df = filtered_df[filtered_df["label"].str.contains(search, case=False, na=False)]
+
+    # Export Buttons (CSV & HTML Summary Report)
+    exp_col1, exp_col2 = st.columns(2)
+    with exp_col1:
+        csv_data = filtered_df.to_csv(index=False).encode('utf-8')
+        st.download_button(
+            label="📥 Download CSV Security Log",
+            data=csv_data,
+            file_name=f"security_events_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
+            mime="text/csv",
+            use_container_width=True,
+        )
+    with exp_col2:
+        report_text = f"# 🛡 SECURITY INCIDENT REPORT\nGenerated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\nTotal Incidents Logged: {len(filtered_df)}\n\n"
+        for _, row in filtered_df.iterrows():
+            report_text += f"- [{row['timestamp']}] {row['event_type'].upper()} ({row['priority']}): {row['label']} | Zone: {row.get('zone_name','None')}\n"
+
+        st.download_button(
+            label="📄 Download Security Report (TXT/MD)",
+            data=report_text.encode('utf-8'),
+            file_name=f"security_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt",
+            mime="text/plain",
+            use_container_width=True,
+        )
 
     st.dataframe(
         filtered_df[["id", "timestamp", "event_type", "label", "priority", "zone_name", "confidence"]],
