@@ -436,7 +436,18 @@ def render_enrolled_persons():
                 st.markdown(f"🖼️ **{len(photos)}** photo(s) captured")
                 st.markdown("✅ Status: **Authorized / Registered**")
 
-            # 3. Expandable Photo Gallery (Opens all photos when clicked)
+                # Remove entire person button
+                if st.button(f"🗑️ Delete {person_name}", key=f"del_person_{person_name}"):
+                    import shutil
+                    from core.face_recognizer import FaceRecognizer
+                    rec = FaceRecognizer(get_config())
+                    if p_dir.exists():
+                        shutil.rmtree(p_dir)
+                    rec.rebuild_person_embeddings(person_name)
+                    st.success(f"Removed '{person_name}' from database.")
+                    st.rerun()
+
+            # 3. Expandable Photo Gallery with per-photo Delete button
             with col_gallery:
                 with st.expander(f"📂 View All {len(photos)} Photos of {person_name}", expanded=False):
                     if photos:
@@ -447,6 +458,16 @@ def render_enrolled_persons():
                                 g_rgb = cv2.cvtColor(g_img, cv2.COLOR_BGR2RGB)
                                 with g_cols[idx % 4]:
                                     st.image(g_rgb, caption=f"#{idx+1}", use_container_width=True)
+                                    if st.button("🗑️ Delete", key=f"del_img_{person_name}_{idx}"):
+                                        try:
+                                            os.remove(p_path)
+                                            from core.face_recognizer import FaceRecognizer
+                                            rec = FaceRecognizer(get_config())
+                                            rec.rebuild_person_embeddings(person_name)
+                                            st.success(f"Deleted photo #{idx+1}!")
+                                            st.rerun()
+                                        except Exception as e:
+                                            st.error(f"Error deleting photo: {e}")
                     else:
                         st.info("No photo files stored in folder.")
 

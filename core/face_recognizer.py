@@ -160,6 +160,46 @@ class FaceRecognizer:
             logger.info(f"✓ Enrolled '{name}' with {len(embeddings)} new + {len(existing)} existing = {total_count} total embedding(s)")
         return len(embeddings)
 
+    def rebuild_person_embeddings(self, name: str):
+        """Recompute embeddings for a person from their current image files on disk."""
+        person_dir = KNOWN_FACES_DIR / name
+        if not person_dir.exists():
+            if name in self._known_db:
+                del self._known_db[name]
+                self.save_embeddings()
+            return
+
+        photos = sorted(list(person_dir.glob("*.jpg")) + list(person_dir.glob("*.png")) + list(person_dir.glob("*.jpeg")))
+        if not photos:
+            if name in self._known_db:
+                del self._known_db[name]
+                self.save_embeddings()
+            return
+
+        from deepface import DeepFace
+        embeddings = []
+        for path in photos:
+            try:
+                result = DeepFace.represent(
+                    img_path=str(path),
+                    model_name=self.model_name,
+                    detector_backend="skip",
+                    enforce_detection=False,
+                    align=False,
+                )
+                if result:
+                    embeddings.append(np.array(result[0]["embedding"]))
+            except Exception as e:
+                logger.warning(f"Error encoding {path}: {e}")
+
+        if embeddings:
+            self._known_db[name] = embeddings
+        elif name in self._known_db:
+            del self._known_db[name]
+
+        self.save_embeddings()
+        logger.info(f"Rebuilt database for '{name}': {len(embeddings)} embedding(s) remaining.")
+
     # ─── Recognition ─────────────────────────────────────────────────────────
 
     def extract_embedding(self, face_crop: np.ndarray) -> Optional[np.ndarray]:
