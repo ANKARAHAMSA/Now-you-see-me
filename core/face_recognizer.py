@@ -205,6 +205,7 @@ class FaceRecognizer:
     def check_liveness(self, face_crop: np.ndarray) -> tuple[bool, float, str]:
         """
         Analyze face crop to detect paper/screen photo spoof attacks.
+        Prevents false alarms when a real person is holding or using a phone.
 
         Returns:
             (is_live: bool, liveness_score: float, reason: str)
@@ -215,27 +216,30 @@ class FaceRecognizer:
         import cv2
         gray = cv2.cvtColor(face_crop, cv2.COLOR_BGR2GRAY)
 
-        # 1. Texture Blur / Sharpness check via Laplacian Variance
-        lap_var = cv2.Laplacian(gray, cv2.CV_64F).var()
+        # 1. Texture Sharpness & Facial Micro-Detail (Laplacian Variance)
+        lap_var = float(cv2.Laplacian(gray, cv2.CV_64F).var())
 
-        # 2. Specular Screen Glare & High-Brightness Pixel Ratio
-        bright_pixels = np.sum(gray > 245) / float(gray.size)
+        # 2. Fourier Transform (FFT) High-Frequency Moiré Pattern Analysis
+        # Digital screens displaying photos create artificial periodic grid frequencies
+        f = np.fft.fft2(gray)
+        fshift = np.fft.fftshift(f)
+        magnitude_spectrum = 20 * np.log(np.abs(fshift) + 1e-5)
 
-        # 3. Color Saturation Uniformity (Screens have artificial backlight saturation)
-        hsv = cv2.cvtColor(face_crop, cv2.COLOR_BGR2HSV)
-        sat_std = float(np.std(hsv[:, :, 1]))
+        # Center region vs high frequency outer region ratio
+        h, w = gray.shape
+        cy, cx = h // 2, w // 2
+        r = 15
+        center_energy = np.mean(magnitude_spectrum[cy-r:cy+r, cx-r:cx+r])
+        outer_energy = np.mean(magnitude_spectrum)
+        fft_ratio = float(center_energy / (outer_energy + 1e-5))
 
-        # Screen photo attacks typically exhibit extreme specular glare (> 4% bright pixels)
-        # or flat artificial color saturation (sat_std < 12)
-        if bright_pixels > 0.05:
-            return False, 0.2, "Screen Glare Detected"
-        if sat_std < 10.0:
-            return False, 0.3, "Artificial Screen Color"
+        # Real faces (even when illuminated by a phone screen) have high natural facial micro-detail (lap_var > 15.0).
+        # Only flag as spoof if texture is unnaturally flat (lap_var < 8.0) AND has digital screen moiré patterns (fft_ratio < 1.05)
+        if lap_var < 8.0 and fft_ratio < 1.05:
+            return False, 0.2, "Flat Screen Photo Detected"
 
-        liveness_score = min(1.0, lap_var / 120.0)
-        is_live = liveness_score > 0.35
-
-        return is_live, liveness_score, "Live Face" if is_live else "Unnatural Texture"
+        liveness_score = min(1.0, lap_var / 50.0)
+        return True, liveness_score, "Live Face"
 
     # ─── Recognition ─────────────────────────────────────────────────────────
 
