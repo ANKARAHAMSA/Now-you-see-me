@@ -298,17 +298,21 @@ def render_event_log(db):
 
     # Snapshot Gallery
     st.markdown("### 📸 Event Snapshots")
-    if "snapshot" in filtered_df.columns:
-        snapshot_events = filtered_df[filtered_df["snapshot"].str.len() > 0].head(8)
+    snapshot_col = "snapshot_path" if "snapshot_path" in filtered_df.columns else "snapshot" if "snapshot" in filtered_df.columns else None
+    if snapshot_col:
+        snapshot_events = filtered_df[filtered_df[snapshot_col].astype(str).str.len() > 0].head(8)
 
         if not snapshot_events.empty:
             cols = st.columns(4)
+            for idx, (_, row) in enumerate(snapshot_events.iterrows()):
+                path = Path(str(row[snapshot_col]))
                 if path.exists():
                     img = cv2.imread(str(path))
                     if img is not None:
                         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-                        with cols[i % 4]:
-                            st.image(img_rgb, caption=path.stem[:30], use_column_width=True)
+                        with cols[idx % 4]:
+                            st.image(img_rgb, caption=path.stem[:30], use_container_width=True)
+                            st.caption(f"**{row.get('label', '')}**")
         else:
             st.info("No snapshots saved yet.")
 
